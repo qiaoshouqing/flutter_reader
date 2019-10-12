@@ -1,0 +1,6 @@
+
+class Text {
+
+  var text;
+
+}
