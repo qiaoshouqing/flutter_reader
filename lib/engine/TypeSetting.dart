@@ -35,36 +35,43 @@ class TypeSetting {
     while (offset < length) {
       var char = str.substring(offset, offset + 1);
       double width = getTextWidth(offset, painter);
+      bool isNewLine = false;
+      bool isNewParagraph = false;
+
       if (char == '\n' || char == '\r') {
-        Line line = new Line();
-        line.lineStr = str.substring(startOffset, offset);
-        line.y = currentLineY;
-        line.x = startX;
-        page.lines.add(line);
-        startOffset = offset + 1;
-        currentLineX = 2 * getTextWidth(0, painter);
-//        段首缩进
-        startX = 2 * getTextWidth(0, painter);
-        //因为要换行，提前赋值下一行Y坐标。
-        currentLineY += getTextHeight(offset, painter);
-        if (isNewPage(currentLineY, getTextHeight(offset, painter),
-            getScreenHeight(context))) {
-          pages.add(page);
-          page = new Page();
-          currentLineY = 0;
-        }
+        //换行符号
+        isNewLine = true;
+        isNewParagraph = true;
       } else if (currentLineX + width > getLineWidth(context)) {
+        //正常换行
+        isNewLine = true;
+      }
+
+      if(isNewLine) {
+        isNewLine = false;
+        //换行
         Line line = new Line();
         line.lineStr = str.substring(startOffset, offset);
         line.y = currentLineY;
         line.x = startX;
         page.lines.add(line);
-        startOffset = offset;
-        currentLineX = 0;
-        //无缩进
-        startX = 0;
+
+        if(isNewParagraph) {
+          //如果是一个新段落，则跳过一个字符。这个地方可能需要改。
+          startOffset = offset + 1;
+          //段首缩进
+          startX = 2 * getTextWidth(0, painter);
+          currentLineX = 2 * getTextWidth(0, painter);
+        } else {
+          startOffset = offset;
+          startX = 0;
+          currentLineX = 0;
+        }
+        isNewParagraph = false;
         //因为要换行，提前赋值下一行坐标。
         currentLineY += getTextHeight(offset, painter);
+
+        //换页
         if (isNewPage(currentLineY, getTextHeight(offset, painter),
             getScreenHeight(context))) {
           pages.add(page);
