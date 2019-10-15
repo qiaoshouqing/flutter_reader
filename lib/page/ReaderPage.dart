@@ -2,7 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_reader/bean/Page.dart';
 import 'package:flutter_reader/engine/FileParse.dart';
 import 'package:flutter_reader/engine/TypeSetting.dart';
+import 'package:flutter_reader/provider/module/ShowSettingModule.dart';
 import 'package:flutter_reader/utils/MyColors.dart';
+import 'package:flutter_reader/utils/ScreenUtil.dart';
+import 'package:provider/provider.dart';
 
 class ReaderPage extends StatefulWidget {
   @override
@@ -33,29 +36,103 @@ class ReaderPageState extends State<ReaderPage> {
   @override
   Widget build(BuildContext context) {
     print("build called");
+    //排版代码，尽量控制在合适的地方才调用。
     TextPainter painter = TypeSetting.initPainer(str);
     painter.layout(minWidth: 0, maxWidth: TypeSetting.getLineWidth(context));
-
     pages = TypeSetting.breakText(str, painter, context);
 
     return Scaffold(body: Builder(
         // Create an inner BuildContext so that the onPressed methods
         // can refer to the Scaffold with Scaffold.of().
         builder: (BuildContext context) {
-          print("Scaffold build");
+      print("ReaderPage Scaffold build");
       scaffoldContext = context;
-      return new PageView.custom(
-        childrenDelegate: new SliverChildBuilderDelegate(
-          (context, index) {
-//            if (index >= pages.length) {}
-            print("build index:" + index.toString());
-            return CustomPaint(
-              size: Size(MediaQuery.of(context).size.width,
-                  MediaQuery.of(context).size.height),
-              painter: MyPainter(scaffoldContext, index, pages),
-            );
-          },
-        ),
+      return new Stack(
+        children: <Widget>[
+          //阅读页
+          Consumer<ShowSettingModule>(
+            builder: (context, showSetting, child) {
+              print("PageView.custom consumer build call");
+              return GestureDetector(
+                onTap: showSetting.switchShowSetting,
+                child: child,
+              );
+            },
+            child: new PageView.custom(
+              childrenDelegate: new SliverChildBuilderDelegate(
+                (context, index) {
+                  print("build index:" + index.toString());
+                  return CustomPaint(
+                    size: Size(MediaQuery.of(context).size.width,
+                        MediaQuery.of(context).size.height),
+                    painter: MyPainter(scaffoldContext, index, pages),
+                  );
+                },
+              ),
+            ),
+          ),
+          //顶部返回键标题栏区域
+          new Positioned(
+            left: 0,
+            top: 0,
+            right: 0,
+            child:
+                Consumer<ShowSettingModule>(builder: (context, showSetting, _) {
+              print("ShowSettingModule consumer called");
+              return new Offstage(
+                  offstage: !(showSetting.value),
+                  child: new Container(
+                    color: MyColors.READER_PAGE_BG,
+                    padding: EdgeInsets.fromLTRB(
+                        ScreenUtil.of(10),
+                        MediaQuery.of(context).padding.top + ScreenUtil.of(5),
+                        ScreenUtil.of(10),
+                        ScreenUtil.of(10)),
+                    child: new Row(
+                      children: <Widget>[
+                        new GestureDetector(
+                          child:
+                              new Icon(Icons.arrow_back, color: Colors.black),
+                          onTap: () {
+                            Navigator.pop(context);
+                          },
+                        ),
+                      ],
+                    ),
+                  ));
+            }),
+          ),
+          //底部相关设置区域
+          new Positioned(
+              left: 0,
+              right: 0,
+              bottom: 0,
+              child: Consumer<ShowSettingModule>(
+                builder: (context, showSetting, _) {
+                  return new Offstage(
+                      offstage: !(showSetting.value),
+                      child: new Container(
+                        color: MyColors.READER_PAGE_BG,
+                        padding: EdgeInsets.fromLTRB(
+                            ScreenUtil.of(10),
+                            ScreenUtil.of(10),
+                            ScreenUtil.of(10),
+                            MediaQuery.of(context).padding.bottom +
+                                ScreenUtil.of(5)),
+                        child: new Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceAround,
+                          children: <Widget>[
+                            new Icon(Icons.menu, color: Colors.black),
+                            new Icon(Icons.settings_ethernet,
+                                color: Colors.black),
+                            new Icon(Icons.wb_sunny, color: Colors.black),
+                            new Icon(Icons.text_format, color: Colors.black),
+                          ],
+                        ),
+                      ));
+                },
+              )),
+        ],
       );
     }));
   }
@@ -76,7 +153,6 @@ class ReaderPageState extends State<ReaderPage> {
 }
 
 class MyPainter extends CustomPainter {
-
   BuildContext context;
   int pageIndex;
   TextPainter textPainter;
@@ -107,18 +183,15 @@ class MyPainter extends CustomPainter {
     for (int i = 0; i < pages[pageIndex].lines.length; i++) {
       painter = TypeSetting.initPainer(pages[pageIndex].lines[i].lineStr);
       painter.layout(minWidth: 0, maxWidth: TypeSetting.getLineWidth(context));
-      painter.paint(
-          canvas,
-          Offset(
-              pages[pageIndex].lines[i].x,
-              pages[pageIndex].lines[i].y));
+      painter.paint(canvas,
+          Offset(pages[pageIndex].lines[i].x, pages[pageIndex].lines[i].y));
     }
   }
 
-
   //绘制页码
   _pagePageNum(List<Page> pages, Canvas canvas, Size size) {
-    String pageNum =  (pageIndex + 1).toString() + " / " + pages.length.toString();
+    String pageNum =
+        (pageIndex + 1).toString() + " / " + pages.length.toString();
     final textStyle = TextStyle(
       color: MyColors.GREY_800,
       fontSize: 14,
@@ -143,14 +216,12 @@ class MyPainter extends CustomPainter {
 
     painter.paint(
         canvas,
-        Offset(
-            TypeSetting.getLineWidth(context) - pageNumsWidth, TypeSetting.getTextAreaMaxY(context)));
+        Offset(TypeSetting.getLineWidth(context) - pageNumsWidth,
+            TypeSetting.getTextAreaMaxY(context)));
   }
-
 
   @override
   bool shouldRepaint(CustomPainter old) {
     return true;
   }
-
 }

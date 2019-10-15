@@ -37,6 +37,8 @@ class MyColors {
   static var GREY_900 = const Color(0xff212121);
 
 
+  static var READER_PAGE_BG = Colors.white;
+
 
   static var colorList = [BEAUTIFY_COLORS_0, BEAUTIFY_COLORS_1, BEAUTIFY_COLORS_2, BEAUTIFY_COLORS_3, BEAUTIFY_COLORS_4, BEAUTIFY_COLORS_5];
 //  static Color getRandomColor() {
@@ -47,6 +49,5 @@ class MyColors {
 //  static Color getColor(var index) {
 //    return colorList[index % colorList.length];
 //  }
-
 
 }
