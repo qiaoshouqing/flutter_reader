@@ -110,7 +110,7 @@ class MyPainter extends CustomPainter {
       painter.paint(
           canvas,
           Offset(
-              TypeSetting.getLeftRightPadding() + pages[pageIndex].lines[i].x,
+              pages[pageIndex].lines[i].x,
               pages[pageIndex].lines[i].y));
     }
   }
@@ -144,7 +144,7 @@ class MyPainter extends CustomPainter {
     painter.paint(
         canvas,
         Offset(
-            TypeSetting.getLineWidth(context) - pageNumsWidth, TypeSetting.getScreenHeight(context)));
+            TypeSetting.getLineWidth(context) - pageNumsWidth, TypeSetting.getTextAreaMaxY(context)));
   }
 
 

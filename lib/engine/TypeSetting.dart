@@ -31,7 +31,7 @@ class TypeSetting {
     int offset = 0;
     double currentLineX = 2 * getTextWidth(0, painter);
     double currentLineY = getTopPadding(context);
-    double startX = getTextWidth(0, painter) * 2;
+    double startX = getLeftRightPadding() + getTextWidth(0, painter) * 2;
     int startOffset = 0;
     while (offset < length) {
       var char = str.substring(offset, offset + 1);
@@ -55,7 +55,7 @@ class TypeSetting {
             }
           }
         }
-      } else if (currentLineX + width > getLineWidth(context)) {
+      } else if (currentLineX + width > getTextAreaMaxX(context)) {
         //正常换行
         isNewLine = true;
       }
@@ -72,20 +72,20 @@ class TypeSetting {
         page.lines.add(line);
         if(isNewParagraph) {
           //段首缩进
-          startX = 2 * getTextWidth(0, painter);
-          currentLineX = 2 * getTextWidth(0, painter);
+          startX = getLeftRightPadding() + 2 * getTextWidth(0, painter);
+          currentLineX = getLeftRightPadding() + 2 * getTextWidth(0, painter);
         } else {
-          startX = 0;
-          currentLineX = 0;
+          startX = getLeftRightPadding();
+          currentLineX = getLeftRightPadding();
         }
         //存在换行的话，把startOffset往后挪一下，避免读取下一行文字的时候带上换行符。
         startOffset = offset + offsetNum;
         offset = startOffset;
         //因为要换行，提前赋值下一行坐标。
-        currentLineY += getTextHeight(0, painter);
+        currentLineY += getTextHeight(0, painter) + getLinePadding();
         //换页
-        if (isNewPage(currentLineY, getTextHeight(offset, painter),
-            getScreenHeight(context))) {
+        if (isNewPage(currentLineY, getTextHeight(0, painter),
+            getTextAreaMaxY(context))) {
           pages.add(page);
           page = new Page();
           currentLineY = getTopPadding(context);
@@ -103,6 +103,7 @@ class TypeSetting {
     }
     pages.add(page);
 
+    //输出排版内容
     print("page count:" + pages.length.toString());
     for (int i = 0; i < pages.length; i++) {
       print("page-" +
@@ -124,10 +125,12 @@ class TypeSetting {
     return false;
   }
 
-  static double getScreenHeight(BuildContext context) {
+  ///获取文字区域的最大y坐标
+  static double getTextAreaMaxY(BuildContext context) {
     return MediaQuery.of(context).size.height - getBottomPadding(context);
   }
 
+  ///文字宽度
   static double getTextWidth(int offest, TextPainter painter) {
     List<TextBox> textBoxList = painter.getBoxesForSelection(
         new TextSelection(baseOffset: offest, extentOffset: offest + 1));
@@ -135,6 +138,7 @@ class TypeSetting {
     return textBox.right - textBox.left;
   }
 
+  ///文字高度
   static double getTextHeight(int offest, TextPainter painter) {
     List<TextBox> textBoxList = painter.getBoxesForSelection(
         new TextSelection(baseOffset: offest, extentOffset: offest + 1));
@@ -142,24 +146,38 @@ class TypeSetting {
     return textBox.bottom - textBox.top;
   }
 
+  ///实际行宽，屏幕宽度减去左右空余空间
   static double getLineWidth(BuildContext context) {
     return MediaQuery.of(context).size.width - getLeftRightPadding() * 2;
   }
 
+  static double getTextAreaMaxX(BuildContext context) {
+    return MediaQuery.of(context).size.width - getLeftRightPadding();
+  }
+
+  ///文字左右空间
   static double getLeftRightPadding() {
     return 20;
   }
 
+  ///文字距离顶部距离（安全区域）
   static double getTopPadding(BuildContext context) {
     return MediaQuery.of(context).padding.top;
   }
 
+  ///文字距离顶部距离（本身的安全区域+底部空余空间）
   static double getBottomPadding(BuildContext context) {
     return MediaQuery.of(context).padding.bottom + getFooterPadding();
   }
 
+  ///底部空余空间（页码显示区域）
   static double getFooterPadding() {
     return ScreenUtil.of(20);
+  }
+
+  ///行间距
+  static double getLinePadding(){
+    return ScreenUtil.of(10);
   }
 
 }
