@@ -1,16 +1,27 @@
-# flutter_reader
+# flutter reader
+## 前言
+公司本身就是搞阅读软件，如果连阅读软件关键的东西都没搞清，想想怎么都说不过去。最近flutter跨平台技术火的一塌糊涂，想来不如用flutter写一款阅读软件，一定有趣极了。
 
-A new Flutter application.
+名字我都想好了，就叫FlutterReader。好了，故事到这里就结束了。
 
-## Getting Started
+~~好吧，开玩笑的。~~
 
-This project is a starting point for a Flutter application.
+## 阅读软件功能思考
+阅读软件看起来只是读读书，但是功能看起来好像有点复杂。先来梳理一下有哪些基本功能。
 
-A few resources to get you started if this is your first Flutter project:
+- txt格式文本阅读、epub格式书籍阅读。一般来说支持这两种格式基本上就够了。不过epub略复杂了。
+- 阅读页面展示是个大头。其中文本显示部分，txt格式和epub格式差距偏大，需要分开研究。
+- 章节显示问题、目录显示文字：文本书如果拆分章节，txt格式的书一个txt文件的整体，区分章节的话需要使用正则表达式找出来有哪些章节来区分。epub书本身就是一个电子书格式，章节拆分自然不成问题。
+- 页码显示问题：要知道页码应该就得知道一共多少页，要知道一共有多少页就要知道一页能显示多少字、一共有多少字。
+- 页面显示问题：解析txt的时候应该构建一个chapter类，里面承载着一个page列表，等到需要的时候拿着页码去取。
+- 行和字：都应该有对应类line、text来对应，不然没法精确了解到整个文本阅读器，以及绘制。
+- 文字选择：读书读到妙处要长按选择文字拷贝出来，或者做个笔记是一个必不可少功能。要做到这一点，必须要能根据你的手指长按的地方知道你选择的是什么文字。需要知道每个字的位置，然后就可以根据位置得出选择的文字了。
+- 文字大小、颜色修改：文字都是自己绘制的，想改一下肯定是不难的，但是得注意文字的大小也是一个绘制行数、页数的关键。
+- 字体：
+- 背景修改：换个背景图片、背景颜色。
+- 章节跳转、进度跳转、笔记跳转：章节跳转感觉有种分封制的意思，书籍知道有多少章节，章节知道有多少页面，页面知道有多少行，每行可以管理下面有多少字。章节跳转的话显示出来那一章的字应该就可以了。但是进度跳转就有点郡县制了，我这本书不仅能知道跳到哪章，还能知道跳到哪页，如果有笔记我还能知道找到这条笔记，整个天下都归我管。
+- 翻页模式：一般都是仿真翻页和左右滑动，上下翻页这种应该没咋有人用吧。
+- 先不管书籍格式的问题，一般来说有如上这些功能，一个阅读核心就差不多了。真正能用还需要有一个书架和本地书倒入功能，起码得能看本地书吧。
 
-- [Lab: Write your first Flutter app](https://flutter.dev/docs/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://flutter.dev/docs/cookbook)
-
-For help getting started with Flutter, view our
-[online documentation](https://flutter.dev/docs), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+## 最后
+至于代码相关的，慢慢写来。
