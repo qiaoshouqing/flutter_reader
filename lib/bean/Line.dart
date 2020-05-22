@@ -1,8 +1,9 @@
 
 class Line {
 
-  var lineStr;
+  String lineStr;
   var x;
   var y;
+  var fileOffest;
 
 }

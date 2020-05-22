@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_reader/bean/Line.dart';
 import 'package:flutter_reader/bean/Page.dart';
@@ -23,7 +25,10 @@ class TypeSetting {
     return painter;
   }
 
-  static List<Page> breakText(String str, TextPainter painter, BuildContext context) {
+
+  ///写的跟屎一样
+  ///todo 需要知道每个字符的文件位置,目前先给放到line上
+  static List<Page> breakText(String str, TextPainter painter, BuildContext context, {int fileOffset = 0}) {
     List<Page> pages = List();
     Page page = new Page();
 
@@ -39,6 +44,7 @@ class TypeSetting {
       bool isNewLine = false;
       bool isNewParagraph = false;
       int offsetNum = 0;
+      fileOffset += utf8.encode(char).length;
 
       if (char == '\n' || char == '\r') {
         if(char == '\n') {
@@ -50,6 +56,7 @@ class TypeSetting {
           if(offset + 1 < length) {
             if(str.substring(offset, offset + 2) == '\r\n') {
               offsetNum = 2;
+              fileOffset++;
               isNewLine = true;
               isNewParagraph = true;
             }
@@ -69,6 +76,7 @@ class TypeSetting {
         line.lineStr = str.substring(startOffset, offset);
         line.y = currentLineY;
         line.x = startX;
+        line.fileOffest = fileOffset;
         page.lines.add(line);
         if(isNewParagraph) {
           //段首缩进
@@ -111,10 +119,26 @@ class TypeSetting {
           " line count:" +
           pages[i].lines.length.toString());
       for (int j = 0; j < pages[i].lines.length; j++) {
-        print("lineStr:" + pages[i].lines[j].lineStr);
+        print("lineStr:" + pages[i].lines[j].lineStr + "，fileOffest：" + pages[i].lines[j].fileOffest.toString());
       }
     }
     return pages;
+  }
+
+  ///去除最后一页的多余内容
+  static int removeOverContent(List<Page> pages) {
+    int lastFileOffset = 0;
+    if(pages != null && pages.length > 0) {
+      pages.removeLast();
+      if(pages.length > 0) {
+        Page lastPage = pages[pages.length - 1];
+        if(lastPage.lines != null && lastPage.lines.length > 0) {
+          lastFileOffset = lastPage.lines[lastPage.lines.length - 2].fileOffest;
+        }
+      }
+    }
+    print("lastFileOffest:" + lastFileOffset.toString());
+    return lastFileOffset;
   }
 
   ///如果下下行的Y大于屏幕宽度了则换一页开始，下一行是即将绘制的。之所以是下下行，因为是y是一行的顶部坐标。
