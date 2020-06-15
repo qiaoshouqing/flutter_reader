@@ -1,15 +1,15 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_reader/bean/Page.dart';
+import 'package:flutter_reader/bean/FPage.dart';
 
 class ReaderModule with ChangeNotifier {
-  List<Page> _pages = [new Page()];
-  List<Page> get value => _pages;
+  List<FPage> _pages = [new FPage()];
+  List<FPage> get value => _pages;
 
-  void setInitPages(List<Page> pages) {
+  void setInitPages(List<FPage> pages) {
     _pages.addAll(pages);
   }
 
-  void addNewPages(List<Page> pages) {
+  void addNewPages(List<FPage> pages) {
     _pages.addAll(pages);
     notifyListeners();
   }

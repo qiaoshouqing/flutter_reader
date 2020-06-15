@@ -1,6 +1,6 @@
 import 'Line.dart';
 
-class Page{
+class FPage{
 
   List<Line> lines = List();
 

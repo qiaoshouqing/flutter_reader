@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_reader/bean/Page.dart';
+import 'package:flutter_reader/bean/FPage.dart';
 import 'package:flutter_reader/engine/FileParse.dart';
 import 'package:flutter_reader/engine/TypeSetting.dart';
 import 'package:flutter_reader/provider/module/ReaderModule.dart';
@@ -37,7 +37,7 @@ class ReaderPageState extends State<ReaderPage> {
   @override
   Widget build(BuildContext context) {
     print("readerpage build called");
-//    Provider.of<ReaderModule>(context).setInitPages([new Page()]);
+//    Provider.of<ReaderModule>(context).setInitPages([new FPage()]);
 
     if (fileParse == null) {
       return new Scaffold(
@@ -118,7 +118,7 @@ class ReaderPageState extends State<ReaderPage> {
                               painter.layout(
                                   minWidth: 0,
                                   maxWidth: TypeSetting.getLineWidth(context));
-                              List<Page> tempPages = TypeSetting.breakText(str, painter, context, fileOffset: FileParse.lastFileOffest);
+                              List<FPage> tempPages = TypeSetting.breakText(str, painter, context, fileOffset: FileParse.lastFileOffest);
                               if (!fileParse.isEnd()) {
                                 int fileOffset =
                                 TypeSetting.removeOverContent(tempPages);
@@ -210,9 +210,9 @@ class MyPainter extends CustomPainter {
   BuildContext context;
   int pageIndex;
   TextPainter textPainter;
-  List<Page> pages;
+  List<FPage> pages;
 
-  MyPainter(BuildContext context, int index, List<Page> pages) {
+  MyPainter(BuildContext context, int index, List<FPage> pages) {
     this.context = context;
     this.pageIndex = index;
     this.pages = pages;
@@ -233,7 +233,7 @@ class MyPainter extends CustomPainter {
     print("结束绘制：pageIndex:" + pageIndex.toString());
   }
 
-  _paintPage(List<Page> pages, TextPainter painter, Canvas canvas, Size size) {
+  _paintPage(List<FPage> pages, TextPainter painter, Canvas canvas, Size size) {
     for (int i = 0; i < pages[pageIndex].lines.length; i++) {
       painter = TypeSetting.initPainer(pages[pageIndex].lines[i].lineStr);
       painter.layout(minWidth: 0, maxWidth: TypeSetting.getLineWidth(context));
@@ -243,7 +243,7 @@ class MyPainter extends CustomPainter {
   }
 
   //绘制页码
-  _pagePageNum(List<Page> pages, Canvas canvas, Size size) {
+  _pagePageNum(List<FPage> pages, Canvas canvas, Size size) {
     String pageNum =
         (pageIndex + 1).toString() + " / " + (pages.length + 0).toString();
     final textStyle = TextStyle(

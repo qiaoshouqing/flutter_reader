@@ -2,7 +2,7 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_reader/bean/Line.dart';
-import 'package:flutter_reader/bean/Page.dart';
+import 'package:flutter_reader/bean/FPage.dart';
 import 'package:flutter_reader/utils/ScreenUtil.dart';
 
 //排版类
@@ -28,9 +28,9 @@ class TypeSetting {
 
   ///写的跟屎一样
   ///todo 需要知道每个字符的文件位置,目前先给放到line上
-  static List<Page> breakText(String str, TextPainter painter, BuildContext context, {int fileOffset = 0}) {
-    List<Page> pages = List();
-    Page page = new Page();
+  static List<FPage> breakText(String str, TextPainter painter, BuildContext context, {int fileOffset = 0}) {
+    List<FPage> pages = List();
+    FPage page = new FPage();
 
     int length = str.length;
     int offset = 0;
@@ -95,7 +95,7 @@ class TypeSetting {
         if (isNewPage(currentLineY, getTextHeight(0, painter),
             getTextAreaMaxY(context))) {
           pages.add(page);
-          page = new Page();
+          page = new FPage();
           currentLineY = getTopPadding(context);
         }
       }
@@ -126,12 +126,12 @@ class TypeSetting {
   }
 
   ///去除最后一页的多余内容
-  static int removeOverContent(List<Page> pages) {
+  static int removeOverContent(List<FPage> pages) {
     int lastFileOffset = 0;
     if(pages != null && pages.length > 0) {
       pages.removeLast();
       if(pages.length > 0) {
-        Page lastPage = pages[pages.length - 1];
+        FPage lastPage = pages[pages.length - 1];
         if(lastPage.lines != null && lastPage.lines.length > 0) {
           lastFileOffset = lastPage.lines[lastPage.lines.length - 2].fileOffest;
         }
